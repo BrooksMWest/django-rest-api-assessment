@@ -25,7 +25,7 @@
   "fields": {
       "title": "Little Plastic Castle",
       "artist_id": 3,
-      "album_id": "Greatest Misses",
+      "album": "Greatest Misses",
       "length": 156
   }
 }
