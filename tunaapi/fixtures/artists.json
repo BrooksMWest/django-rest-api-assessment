@@ -1,0 +1,20 @@
+[
+  {
+      "model": "tunaapi.artist",
+      "pk": 1,
+      "fields": {
+          "name": "The Beatles",
+          "age": 100,
+          "bio": "Four young lads from Liverpool."
+      }
+  },
+  {
+    "model": "tunaapi.artist",
+    "pk": 2,
+    "fields": {
+        "name": "Bob Dylan",
+        "age": 83,
+        "bio": "Just a kid from Minnesota."
+    }
+ }
+]
