@@ -16,5 +16,14 @@
         "age": 83,
         "bio": "Just a kid from Minnesota."
     }
- }
+ },
+ {
+  "model": "tunaapi.artist",
+  "pk": 3,
+  "fields": {
+      "name": "Ani DiFranco",
+      "age": 54,
+      "bio": "Righteous babe from Buffalo ."
+  }
+}
 ]

@@ -1,0 +1,32 @@
+[
+  {
+      "model": "tunaapi.song",
+      "pk": 1,
+      "fields": {
+          "title": "HELP",
+          "artist_id": 1,
+          "album": "HELP Soundtrack",
+          "length": 138
+      }
+  },
+  {
+    "model": "tunaapi.song",
+    "pk": 2,
+    "fields": {
+        "title": "Mr. Tambourine Man",
+        "artist_id": 2,
+        "album": "Bringing it All Back Home",
+        "length": 251
+    }
+ },
+ {
+  "model": "tunaapi.song",
+  "pk": 3,
+  "fields": {
+      "title": "Little Plastic Castle",
+      "artist_id": 3,
+      "album_id": "Greatest Misses",
+      "length": 156
+  }
+}
+]
