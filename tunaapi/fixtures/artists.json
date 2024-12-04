@@ -1,0 +1,29 @@
+[
+  {
+      "model": "tunaapi.artist",
+      "pk": 1,
+      "fields": {
+          "name": "The Beatles",
+          "age": 100,
+          "bio": "Four young lads from Liverpool."
+      }
+  },
+  {
+    "model": "tunaapi.artist",
+    "pk": 2,
+    "fields": {
+        "name": "Bob Dylan",
+        "age": 83,
+        "bio": "Just a kid from Minnesota."
+    }
+ },
+ {
+  "model": "tunaapi.artist",
+  "pk": 3,
+  "fields": {
+      "name": "Ani DiFranco",
+      "age": 54,
+      "bio": "Righteous babe from Buffalo ."
+  }
+}
+]
