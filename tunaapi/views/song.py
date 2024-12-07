@@ -42,16 +42,15 @@ class SongView(ViewSet):
         Returns
              Response -- JSON serialized song instance
         """
-        song = Song.objects.get(uid=request.data["song"])
-        song_genre = SongGenre.objects.get(pk=request.data["song_genre"])
+        artist = Artist.objects.get(pk=request.data["artist_id"])
+        ##song_genre = SongGenre.objects.get(pk=request.data["song_genre"])
 
         song = Song.objects.create(
             title=request.data["title"],
-            artist=artist,
+            artist_id=artist,
             album=request.data["album"],
-            length=request.data["length"],
-            song_genre=song_genre,
-            gamer=gamer
+            length=request.data["length"]
+            ##song_genre=song_genre
         )
         serializer = SongSerializer(song)
         return Response(serializer.data)
@@ -76,8 +75,8 @@ class SongView(ViewSet):
         return Response(None, status=status.HTTP_204_NO_CONTENT)
     
     def destroy(self, request, pk):
-        game = Song.objects.get(pk=pk)
-        game.delete()
+        song = Song.objects.get(pk=pk)
+        song.delete()
         return Response(None, status=status.HTTP_204_NO_CONTENT)
         
 
@@ -87,5 +86,5 @@ class SongSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Song
-        depth =1
+        depth =2
         fields = ('id', 'title', 'artist_id', 'album', 'length')
