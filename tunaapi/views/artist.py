@@ -46,7 +46,6 @@ class ArtistView(ViewSet):
          """
 
         artist = Artist.objects.create(
-            artist=artist,
             name=request.data["name"],
             age=request.data["age"],
             bio=request.data["bio"],    
