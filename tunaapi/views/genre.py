@@ -44,7 +44,7 @@ class GenreView(ViewSet):
             description=request.data["description"] 
         )
         serializer = GenreSerializer(genre)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
     
     def update(self, request, pk):
         """Handle PUT requests for a game
@@ -52,13 +52,24 @@ class GenreView(ViewSet):
         Returns:
             Response -- Empty body with 204 status code
         """
-        genre = Genre.objects.get(pk=pk)
-        genre.description = request.data["description"]
+        try:
+            genre = Genre.objects.get(pk=pk)
+            genre.description = request.data["description"]
        
-        genre.save()
+            genre.save()
 
-        return Response(None, status=status.HTTP_204_NO_CONTENT)
+            serializer = GenreSerializer(genre)
 
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Genre.DoesNotExist:
+            return Response(
+            {"message": "Genre not found."},
+            status=status.HTTP_404_NOT_FOUND)
+        except KeyError as e:
+            return Response(
+            {"message": f"Missing required field: {e.args[0]}"},
+            status=status.HTTP_400_BAD_REQUEST
+            )
     def destroy(self, request, pk):
         event = Genre.objects.get(pk=pk)
         event.delete()
