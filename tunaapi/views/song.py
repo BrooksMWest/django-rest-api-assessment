@@ -39,23 +39,35 @@ class SongView(ViewSet):
         return Response(serializer.data)
     
     def create(self, request):
-        """Handle POST operations
+        """Handle POST requests to create a new song
 
-        Returns
-             Response -- JSON serialized song instance
+        Returns:
+            Response -- JSON serialized song instance with 201 status
         """
-        artist = Artist.objects.get(pk=request.data["artist_id"])
-        ##song_genre = SongGenre.objects.get(pk=request.data["song_genre"])
+        try:
+            artist = Artist.objects.get(pk=request.data["artist_id"])
 
-        song = Song.objects.create(
-        title=request.data["title"],
-        artist=artist,
-        album=request.data["album"],
-        length=request.data["length"]
-        ##song_genre=song_genre
-        )
-        serializer = SongSerializer(song)
-        return Response(serializer.data)
+            # Create the Song instance
+            song = Song.objects.create(
+                title=request.data["title"],
+                artist=artist,
+                album=request.data["album"],
+                length=request.data["length"],)
+
+            # Serialize the created song
+            serializer = SongSerializer(song)
+
+            # Return the serialized data with 201 CREATED
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        except Artist.DoesNotExist:
+            return Response(
+                {"message": "Artist not found."},
+                status=status.HTTP_404_NOT_FOUND)
+        except KeyError as e:
+            return Response(
+                {"message": f"Missing required field: {e.args[0]}"},
+                status=status.HTTP_400_BAD_REQUEST)
     
     def update(self, request, pk):
         """Handle PUT requests for a game
@@ -78,7 +90,9 @@ class SongView(ViewSet):
             ##song.song_genre = song_genre
             song.save()
 
-            return Response(None, status=status.HTTP_204_NO_CONTENT)
+            serializer = SongSerializer(song)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
         except Artist.DoesNotExist:
             return Response(
             {"message": "Artist not found."},
@@ -117,10 +131,11 @@ class SongSerializer(serializers.ModelSerializer):
     """
     artist = ArtistSerializer()  # Nested Artist
     genres = serializers.SerializerMethodField()  # Genres through join table
+    artist_id = serializers.IntegerField(source='artist.id', read_only=True)
     class Meta:
         model = Song
         depth =2
-        fields = ('id', 'title', 'artist', 'album', 'length', 'genres')
+        fields = ('id', 'title', 'artist', 'album', 'length', 'genres', 'artist_id')
         
     def get_genres(self, obj):
         # Fetch genres through the SongGenre join table

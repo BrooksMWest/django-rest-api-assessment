@@ -51,22 +51,39 @@ class ArtistView(ViewSet):
             bio=request.data["bio"],    
         )
         serializer = ArtistSerializer(artist)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
     
     def update(self, request, pk):
-        """Handle PUT requests for a game
+      """Handle PUT requests for updating an artist
 
-        Returns:
-            Response -- Empty body with 204 status code
-        """
-        artist = Artist.objects.get(pk=pk)
-        artist.name = request.data["name"]
-        artist.age = request.data["age"]
-        artist.bio = request.data["bio"]
-       
-        artist.save()
+      Returns:
+        Response -- JSON serialized artist instance with 200 status
+      """
+      try:
+          # Fetch the artist by primary key
+          artist = Artist.objects.get(pk=pk)
 
-        return Response(None, status=status.HTTP_204_NO_CONTENT)
+          # Update fields
+          artist.name = request.data["name"]
+          artist.age = request.data["age"]
+          artist.bio = request.data["bio"]
+          artist.save()
+
+          # Serialize the updated artist
+          serializer = ArtistSerializer(artist)
+
+          # Return updated artist data with 200 OK
+          return Response(serializer.data, status=status.HTTP_200_OK)
+      except Artist.DoesNotExist:
+        return Response(
+            {"message": "Artist not found."},
+            status=status.HTTP_404_NOT_FOUND)
+        
+      except KeyError as e:
+        return Response(
+            {"message": f"Missing required field: {e.args[0]}"},
+            status=status.HTTP_400_BAD_REQUEST)
+
     
     def destroy(self, request, pk):
         event = Artist.objects.get(pk=pk)
@@ -76,7 +93,11 @@ class ArtistView(ViewSet):
 class ArtistSerializer(serializers.ModelSerializer):
     """JSON serializer for artists
     """
+    song_count = serializers.SerializerMethodField()
     class Meta:
         model = Artist
         depth = 1
-        fields = ('id', 'name', 'age', 'bio', 'songs')
+        fields = ('id', 'name', 'age', 'bio', 'songs', 'song_count')
+
+    def get_song_count(self, obj):
+        return obj.songs.count()
