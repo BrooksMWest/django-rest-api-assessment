@@ -76,8 +76,13 @@ class SongSerializer(serializers.ModelSerializer):
 class GenreSerializer(serializers.ModelSerializer):
     """JSON serializer for genres
     """
-    songs = SongSerializer(many=True, read_only=True)
+    songs = serializers.SerializerMethodField()
     class Meta:
         model = Genre
         depth = 1
         fields = ('id', 'description', 'songs')
+        
+    def get_songs(self, obj):
+        # Fetch related songs through the SongGenre join table
+        related_songs = Song.objects.filter(songgenre__genre=obj)
+        return SongSerializer(related_songs, many=True).data
