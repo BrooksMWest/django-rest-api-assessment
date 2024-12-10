@@ -29,11 +29,11 @@ class ArtistView(ViewSet):
         Returns:
             Response -- JSON serialized list of artists
         """
-        artists = Artist.objects.all()
+        artists = Artist.objects.prefetch_related('songs').all()
 
-        event_game = request.query_params.get('event', None)
-        if event_game is not None:
-            events = events.filter(event_id=event_game)
+        song_id = request.query_params.get('song', None)
+        if song_id is not None:
+            artists = artists.filter(song__id=song_id)
 
         serializer = ArtistSerializer(artists, many=True)
         return Response(serializer.data)
@@ -79,4 +79,4 @@ class ArtistSerializer(serializers.ModelSerializer):
     class Meta:
         model = Artist
         depth = 1
-        fields = ('id', 'name', 'age', 'bio')
+        fields = ('id', 'name', 'age', 'bio', 'songs')
