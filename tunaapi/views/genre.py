@@ -3,7 +3,8 @@ from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers, status
-from tunaapi.models import Genre
+from tunaapi.models import Genre, Song
+
 
 
 class GenreView(ViewSet):
@@ -16,7 +17,7 @@ class GenreView(ViewSet):
             Response -- JSON serialized genre
         """
         try:
-            genre = Genre.objects.get(pk=pk)
+            genre = Genre.objects.prefetch_related('songgenre_set__song').get(pk=pk)
             serializer = GenreSerializer(genre)
             return Response(serializer.data)
         except Genre.DoesNotExist as ex:
@@ -44,10 +45,44 @@ class GenreView(ViewSet):
         )
         serializer = GenreSerializer(genre)
         return Response(serializer.data)
+    
+    def update(self, request, pk):
+        """Handle PUT requests for a game
+
+        Returns:
+            Response -- Empty body with 204 status code
+        """
+        genre = Genre.objects.get(pk=pk)
+        genre.description = request.data["description"]
+       
+        genre.save()
+
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+    def destroy(self, request, pk):
+        event = Genre.objects.get(pk=pk)
+        event.delete()
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+    
+class SongSerializer(serializers.ModelSerializer):
+    artist_id = serializers.IntegerField(source='artist.id')
+    """JSON serializer for song genres
+    """
+    class Meta:
+        model = Song
+        depth =2
+        fields = ('id', 'title', 'artist_id', 'album', 'length')
 
 class GenreSerializer(serializers.ModelSerializer):
     """JSON serializer for genres
     """
+    songs = serializers.SerializerMethodField()
     class Meta:
         model = Genre
-        fields = ('id', 'description')
+        depth = 1
+        fields = ('id', 'description', 'songs')
+        
+    def get_songs(self, obj):
+        # Fetch related songs through the SongGenre join table
+        related_songs = Song.objects.filter(songgenre__genre=obj)
+        return SongSerializer(related_songs, many=True).data
